@@ -1,0 +1,191 @@
+### Variables
+@baseUrl = http://localhost:8003/api/v1
+@token = YOUR_JWT_TOKEN_HERE
+@postId =
+@mediaId =
+@tagId =
+
+### Health Check
+GET {{baseUrl}}/health
+
+### ==================== TAGS ====================
+
+### Create Tag
+POST {{baseUrl}}/tags
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Technology",
+  "slug": "technology"
+}
+
+### Get All Tags
+GET {{baseUrl}}/tags
+
+### Get Tag by ID
+GET {{baseUrl}}/tags/{{tagId}}
+
+### Delete Tag
+DELETE {{baseUrl}}/tags/{{tagId}}
+Authorization: Bearer {{token}}
+
+### ==================== MEDIA ====================
+
+### Upload Media
+POST {{baseUrl}}/media
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data
+
+url=https://res.cloudinary.com/demo/image/upload/sample.jpg
+&type=image
+&provider=cloudinary
+
+### Get Media by ID
+GET {{baseUrl}}/media/{{mediaId}}
+Authorization: Bearer {{token}}
+
+### Delete Media
+DELETE {{baseUrl}}/media/{{mediaId}}
+Authorization: Bearer {{token}}
+
+### ==================== POSTS ====================
+
+### Create Post (Draft)
+POST {{baseUrl}}/posts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+x-user-id: 09764c73-129b-4f05-8c45-8c2849014ede
+
+{
+  "title": "My First Blog Post",
+  "slug": "my-first-blog-post",
+  "excerpt": "This is a short excerpt of my blog post",
+  "content": "This is the full content of my blog post. It can be very long.",
+  "cover_media_id": null,
+  "media_ids": [],
+  "tag_ids": []
+}
+
+### Update Post
+PUT {{baseUrl}}/posts/{{postId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Updated Blog Post Title",
+  "excerpt": "Updated excerpt",
+  "content": "Updated content - this will create a new version",
+  "cover_media_id": null,
+  "media_ids": [],
+  "tag_ids": []
+}
+
+### Get Post by ID
+GET {{baseUrl}}/posts/{{postId}}
+
+### Get Post by Slug (Published only)
+GET {{baseUrl}}/posts/slug/my-first-blog-post
+
+### List All Posts
+GET {{baseUrl}}/posts?page=1&per_page=10
+
+### List Posts by Status
+GET {{baseUrl}}/posts?status=draft&page=1&per_page=10
+
+### List Posts by Author
+GET {{baseUrl}}/posts?author_id=USER_UUID&page=1&per_page=10
+
+### List Posts by Tag
+GET {{baseUrl}}/posts?tag_id=TAG_UUID&page=1&per_page=10
+
+### List Published Posts
+GET {{baseUrl}}/posts?status=published&page=1&per_page=10
+
+### Publish Post
+POST {{baseUrl}}/posts/{{postId}}/publish
+Authorization: Bearer {{token}}
+
+### Unpublish Post
+POST {{baseUrl}}/posts/{{postId}}/unpublish
+Authorization: Bearer {{token}}
+
+### Delete Post
+DELETE {{baseUrl}}/posts/{{postId}}
+Authorization: Bearer {{token}}
+
+### ==================== COMPLETE WORKFLOW ====================
+
+### 1. Create Tags
+# @name createTag1
+POST {{baseUrl}}/tags
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Golang",
+  "slug": "golang"
+}
+
+### 2. Create another Tag
+# @name createTag2
+POST {{baseUrl}}/tags
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Microservices",
+  "slug": "microservices"
+}
+
+### 3. Upload Cover Image
+# @name uploadCover
+POST {{baseUrl}}/media
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data
+
+url=https://res.cloudinary.com/demo/image/upload/sample.jpg
+&type=image
+&provider=cloudinary
+
+### 4. Upload Content Image
+# @name uploadImage
+POST {{baseUrl}}/media
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data
+
+url=https://res.cloudinary.com/demo/image/upload/sample2.jpg
+&type=image
+&provider=cloudinary
+
+### 5. Create Post with Tags and Media
+# @name createPost
+POST {{baseUrl}}/posts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Building Microservices with Golang",
+  "slug": "building-microservices-with-golang",
+  "excerpt": "Learn how to build scalable microservices using Golang",
+  "content": "In this comprehensive guide, we'll explore how to build microservices with Golang...",
+  "cover_media_id": "COVER_MEDIA_ID",
+  "media_ids": ["IMAGE_MEDIA_ID"],
+  "tag_ids": ["GOLANG_TAG_ID", "MICROSERVICES_TAG_ID"]
+}
+
+### 6. Update Post Content (Create new version)
+PUT {{baseUrl}}/posts/{{postId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "content": "Updated content with more details about microservices architecture..."
+}
+
+### 7. Publish the Post
+POST {{baseUrl}}/posts/{{postId}}/publish
+Authorization: Bearer {{token}}
+
+### 8. View Published Post
+GET {{baseUrl}}/posts/slug/building-microservices-with-golang

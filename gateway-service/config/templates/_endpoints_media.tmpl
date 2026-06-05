@@ -1,0 +1,49 @@
+{
+  "@comment": "upload image",
+  "endpoint": "/media/api/v1/image/upload",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_media }}"],
+      "url_pattern": "/api/v1/images/upload",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "upload video",
+  "endpoint": "/media/api/v1/video/upload",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_media }}"],
+      "url_pattern": "/api/v1/videos/upload",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+}
+

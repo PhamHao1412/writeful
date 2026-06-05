@@ -1,0 +1,240 @@
+{
+  "@comment": "create a conversation",
+  "endpoint": "/chat/api/v1/conversations",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_chat }}"],
+      "url_pattern": "/api/v1/conversations",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "get list conversation",
+  "endpoint": "/chat/api/v1/conversations",
+  "method": "GET",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_chat }}"],
+      "url_pattern": "/api/v1/conversations",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "get conversation by id",
+  "endpoint": "/chat/api/v1/conversations/{id}",
+  "method": "GET",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_chat }}"],
+      "url_pattern": "/api/v1/conversations/{id}",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "add participant to conversation",
+  "endpoint": "/chat/api/v1/conversations/{id}/participants",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_chat }}"],
+      "url_pattern": "/api/v1/conversations/{id}/participants",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "read conversation",
+  "endpoint": "/chat/api/v1/conversations/read",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_chat }}"],
+      "url_pattern": "/api/v1/conversations/read",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "send a message",
+  "endpoint": "/chat/api/v1/messages",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_chat }}"],
+      "url_pattern": "/api/v1/messages",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "toggle message reaction",
+  "endpoint": "/chat/api/v1/messages/{id}/reactions",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_chat }}"],
+      "url_pattern": "/api/v1/messages/{id}/reactions",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "send WebRTC signaling message",
+  "endpoint": "/chat/api/v1/messages/signaling",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_chat }}"],
+      "url_pattern": "/api/v1/messages/signaling",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "get a messages",
+  "endpoint": "/chat/api/v1/messages",
+  "method": "GET",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_chat }}"],
+      "url_pattern": "/api/v1/messages",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "delete conversation",
+  "endpoint": "/chat/api/v1/conversations/{id}/participants/{participant_id}",
+  "method": "DELETE",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_chat }}"],
+      "url_pattern": "/api/v1/conversations/{id}/participants/{participant_id}",
+      "method": "DELETE",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+}

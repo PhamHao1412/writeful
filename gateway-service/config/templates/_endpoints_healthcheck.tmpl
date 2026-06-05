@@ -1,0 +1,17 @@
+{
+    "@comment": "Health Check",
+    "endpoint": "/health",
+    "method": "GET",
+    "output_encoding": "json",
+    "backend": [{"host": ["http://no_baz"], "url_pattern": "/"}],
+    "extra_config": {
+        "proxy": {
+            "static": {
+                "strategy": "errored",
+                "data": {
+                    "status": "OK"
+                }
+            }
+        }
+    }
+}

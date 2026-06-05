@@ -1,0 +1,33 @@
+"security/cors": {
+  "allow_origins": [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://2a89936da485.ngrok-free.app",
+     "https://writeful-fe.onrender.com",
+    "null"
+  ],
+  "allow_methods": [
+    "POST",
+    "GET",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS"
+  ],
+  "allow_headers": [
+    "Origin",
+    "Authorization",
+    "Content-Type",
+    "Accept",
+    "X-User-ID",
+    "Accept-Encoding",
+    "Accept-Language"
+  ],
+  "expose_headers": [
+    "Content-Length",
+    "Content-Type",
+    "X-User-ID"
+  ],
+  "allow_credentials": true,
+  "max_age": "12h"
+}

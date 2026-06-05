@@ -1,0 +1,38 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Docker
+docker-compose.override.yml
+
+# Backups
+backups/
+*.tar.gz
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Temporary files
+tmp/
+temp/
+
+# Frontend (Only push backend services)
+writeful-fe/
+
+# Go build binaries & cache
+**/.gocache/
+**/cmd/serverd/serverd
+*/migrate
+*/main

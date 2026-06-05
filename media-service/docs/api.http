@@ -1,0 +1,118 @@
+### Health Check
+GET http://localhost:8005/api/v1/health
+Content-Type: application/json
+
+
+### Upload Image
+POST http://localhost:8005/api/v1/images/upload
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="example.jpg"
+Content-Type: image/jpeg
+
+< ./path/to/your/image.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Get Image by ID
+GET http://localhost:8005/api/v1/images/{{image_id}}
+Content-Type: application/json
+
+### List Images
+GET http://localhost:8005/api/v1/images?limit=10&offset=0&sort=desc
+Content-Type: application/json
+
+### Resize Image
+POST http://localhost:8005/api/v1/images/resize
+Content-Type: application/json
+
+{
+  "id": "{{image_id}}",
+  "width": 800,
+  "height": 600
+}
+
+### Convert Image Format
+POST http://localhost:8005/api/v1/images/convert
+Content-Type: application/json
+
+{
+  "id": "{{image_id}}",
+  "format": "png"
+}
+
+### Apply Filter
+POST http://localhost:8005/api/v1/images/filter
+Content-Type: application/json
+
+{
+  "id": "{{image_id}}",
+  "filter": "grayscale"
+}
+
+### Crop Image
+POST http://localhost:8005/api/v1/images/crop
+Content-Type: application/json
+
+{
+  "id": "{{image_id}}",
+  "width": 500,
+  "height": 500,
+  "x": 100,
+  "y": 100
+}
+
+### Rotate Image
+POST http://localhost:8005/api/v1/images/rotate
+Content-Type: application/json
+
+{
+  "id": "{{image_id}}",
+  "angle": 90
+}
+
+### Flip Image
+POST http://localhost:8005/api/v1/images/flip
+Content-Type: application/json
+
+{
+  "id": "{{image_id}}",
+  "flip_axis": "horizontal"
+}
+
+### Add Watermark
+POST http://localhost:8005/api/v1/images/watermark
+Content-Type: application/json
+
+{
+  "id": "{{image_id}}",
+  "watermark": "watermark_public_id"
+}
+
+### Compress Image
+POST http://localhost:8005/api/v1/images/compress
+Content-Type: application/json
+
+{
+  "id": "{{image_id}}",
+  "quality": "auto"
+}
+
+### Upload Video
+POST http://localhost:8005/api/v1/videos/upload
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="example.mp4"
+Content-Type: video/mp4
+
+< ./path/to/your/video.mp4
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Get Video by ID
+GET http://localhost:8005/api/v1/videos/{{video_id}}
+Content-Type: application/json
+
+### List Videos
+GET http://localhost:8005/api/v1/videos?limit=10&offset=0&sort=desc
+Content-Type: application/json

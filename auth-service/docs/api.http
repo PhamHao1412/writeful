@@ -1,0 +1,80 @@
+### Variables
+@baseUrl = http://localhost:8004
+@apiVersion = v1
+@adminKey = hacker1412
+@accessToken = <your_access_token>
+@userId = <your_user_id>
+@targetUserId = <target_user_id>
+
+### Health Check
+GET {{baseUrl}}/health
+Content-Type: application/json
+
+###
+
+### Sign Up - Register a new user
+POST {{baseUrl}}/api/{{apiVersion}}/auth/signup
+Content-Type: application/json
+X-Key-ID: {{adminKey}}
+
+{
+  "username": "haopham1412",
+  "email": "hao.pham1412@gmail.com",
+  "password": "hacker1412",
+  "display_name": "Hao Pham",
+  "avatar_url": "https://example.com/avatar.jpg",
+  "bio": "Software Engineer"
+}
+
+###
+
+### Login - Authenticate user
+POST {{baseUrl}}/api/{{apiVersion}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "hao.pham1412@gmail.com",
+  "password": "hacker1412"
+}
+
+###
+
+### Refresh Token - Get new access token using refresh token
+POST {{baseUrl}}/api/{{apiVersion}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsImtpZCI6IlNJTTIiLCJ0eXAiOiJKV1QifQ.eyJpZCI6IjA5NzY0YzczLTEyOWItNGYwNS04YzQ1LThjMjg0OTAxNGVkZSIsImVtYWlsIjoiaGFvLnBoYW0xNDEyQGdtYWlsLmNvbSIsInN0YXR1cyI6ImFjdGl2ZSIsInJvbGVzIjpbInN1cGVyX2FkbWluIl0sInRva2VuX3R5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NjgwMzkzMjgsImlhdCI6MTc2ODAzNTcyOH0.FMo-zAo3PoVYgaCFGWOtTUUAsifunuypE0Z3rvXk-aU"
+}
+
+###
+
+### Follow a user
+POST {{baseUrl}}/api/{{apiVersion}}/users/{{targetUserId}}/follow
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+X-User-Id: {{userId}}
+
+###
+
+### Unfollow a user
+DELETE {{baseUrl}}/api/{{apiVersion}}/users/{{targetUserId}}/unfollow
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+X-User-Id: {{userId}}
+
+###
+
+### Get followers of a user
+GET {{baseUrl}}/api/{{apiVersion}}/users/{{targetUserId}}/followers?page=1&page_size=10
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###
+
+### Get following of a user
+GET {{baseUrl}}/api/{{apiVersion}}/users/{{targetUserId}}/following?page=1&page_size=10
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###

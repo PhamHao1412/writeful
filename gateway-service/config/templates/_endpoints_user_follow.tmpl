@@ -1,0 +1,96 @@
+{
+  "@comment": "follow a user",
+  "endpoint": "/auth/api/v1/user/follow/{id}",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_auth }}"],
+      "url_pattern": "/api/v1/user/follow/{id}",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+    {{ template "_auth_validator.tmpl" .}}
+  }
+},
+{
+  "@comment": "get followers",
+  "endpoint": "/auth/api/v1/user/followers/{id}",
+  "method": "GET",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_auth }}"],
+      "url_pattern": "/api/v1/user/followers/{id}",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+    {{ template "_auth_validator.tmpl" .}}
+  }
+},
+{
+  "@comment": "get following",
+  "endpoint": "/auth/api/v1/user/following/{id}",
+  "method": "GET",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_auth }}"],
+      "url_pattern": "/api/v1/user/following/{id}",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+    {{ template "_auth_validator.tmpl" .}}
+  }
+},
+{
+  "@comment": "unfollow a user",
+  "endpoint": "/auth/api/v1/user/unfollow/{id}",
+  "method": "DELETE",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_auth }}"],
+      "url_pattern": "/api/v1/user/unfollow/{id}",
+      "method": "DELETE",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+    {{ template "_auth_validator.tmpl" .}}
+  }
+}

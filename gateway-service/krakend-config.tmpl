@@ -1,0 +1,20 @@
+{
+   "$schema": "https://www.krakend.io/schema/v3.json",
+   "version": 3,
+   "disable_access_log": true,
+   "name": "{{ env "SERVICE_NAME" }} - {{ .env.name }}",
+   "host": [ "{{ .env.global.host }}" ],
+   "port": {{ .env.global.port }},
+   "timeout": "{{ .env.global.time_out }}s",
+   "cache_ttl": "{{ .env.global.cache_ttl }}s",
+   "extra_config": {
+      {{template "_security.tmpl" . }},
+      {{template "_telemetry.tmpl" . }},
+      "router": {
+         "hide_version_header": true
+      }
+   },
+   "endpoints": [
+      {{ template "_endpoints.tmpl" . }}
+   ]
+}

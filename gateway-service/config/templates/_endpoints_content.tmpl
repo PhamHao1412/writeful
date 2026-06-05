@@ -1,0 +1,277 @@
+{
+  "@comment": "get posts",
+  "endpoint": "/content/api/v1/post",
+  "method": "GET",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_content }}"],
+      "url_pattern": "/api/v1/post",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+    }
+},
+{
+  "@comment": "get detail post",
+  "endpoint": "/content/api/v1/post/{id}",
+  "method": "GET",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_content }}"],
+      "url_pattern": "/api/v1/post/{id}",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "create a post",
+  "endpoint": "/content/api/v1/post",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_content }}"],
+      "url_pattern": "/api/v1/post",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "publish a post",
+  "endpoint": "/content/api/v1/post/{id}/publish",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_content }}"],
+      "url_pattern": "/api/v1/post/{id}/publish",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "update a post",
+  "endpoint": "/content/api/v1/post/{id}",
+  "method": "PUT",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_content }}"],
+      "url_pattern": "/api/v1/post/{id}",
+      "method": "PUT",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "upload media",
+  "endpoint": "/content/api/v1/media",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_content }}"],
+      "url_pattern": "/api/v1/media",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "delete a post",
+  "endpoint": "/content/api/v1/post/{id}",
+  "method": "DELETE",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_content }}"],
+      "url_pattern": "/api/v1/post/{id}",
+      "method": "DELETE",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      {{ template "_auth_validator.tmpl" .}}
+    }
+},
+{
+  "@comment": "List active feed stories",
+  "endpoint": "/content/api/v1/stories",
+  "method": "GET",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_content }}"],
+      "url_pattern": "/api/v1/stories",
+      "method": "GET",
+      "encoding": "json"
+    }
+  ],
+  "extra_config": {
+    {{ template "_auth_validator.tmpl" . }}
+  }
+},
+{
+  "@comment": "Create a story slide",
+  "endpoint": "/content/api/v1/stories",
+  "method": "POST",
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_content }}"],
+      "url_pattern": "/api/v1/stories",
+      "method": "POST",
+      "encoding": "json"
+    }
+  ],
+  "extra_config": {
+    {{ template "_auth_validator.tmpl" . }}
+  }
+},
+{
+  "@comment": "Mark a story slide as read",
+  "endpoint": "/content/api/v1/stories/{id}/seen",
+  "method": "POST",
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_content }}"],
+      "url_pattern": "/api/v1/stories/{id}/seen",
+      "method": "POST",
+      "encoding": "json"
+    }
+  ],
+  "extra_config": {
+    {{ template "_auth_validator.tmpl" . }}
+  }
+},
+{
+  "@comment": "Fetch shared music catalog",
+  "endpoint": "/content/api/v1/musics",
+  "method": "GET",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_content }}"],
+      "url_pattern": "/api/v1/musics",
+      "method": "GET",
+      "encoding": "json"
+    }
+  ],
+  "extra_config": {
+    {{ template "_auth_validator.tmpl" . }}
+  }
+},
+{
+  "@comment": "Add new music to server catalog",
+  "endpoint": "/content/api/v1/musics",
+  "method": "POST",
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_content }}"],
+      "url_pattern": "/api/v1/musics",
+      "method": "POST",
+      "encoding": "json"
+    }
+  ],
+  "extra_config": {
+    {{ template "_auth_validator.tmpl" . }}
+  }
+},
+{
+  "@comment": "Delete a story slide",
+  "endpoint": "/content/api/v1/stories/{id}",
+  "method": "DELETE",
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_content }}"],
+      "url_pattern": "/api/v1/stories/{id}",
+      "method": "DELETE",
+      "encoding": "json"
+    }
+  ],
+  "extra_config": {
+    {{ template "_auth_validator.tmpl" . }}
+  }
+}

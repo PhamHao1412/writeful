@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  content-service:
+    image: golang:1.25-alpine
+    container_name: content-service
+    ports:
+      - "8003:8003"
+    volumes:
+      - .:/app
+      -
+    working_dir: /app
+    entrypoint: []
+    environment:
+      APP_PORT: 8003
+      APP_NAME: content-service
+      APP_DB_SCHEMA_NAME: content_service
+      APP_DB_URL: "postgres://postgres:@host.docker.internal:5438/playground?sslmode=disable&search_path=content_service"
+    restart: unless-stopped

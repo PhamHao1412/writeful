@@ -1,0 +1,1619 @@
+{
+   "$schema": "https://www.krakend.io/schema/v3.json",
+   "version": 3,
+   "disable_access_log": true,
+   "name": " - LOCAL",
+   "host": [ "127.0.0.1" ],
+   "port": 8080,
+   "timeout": "30s",
+   "cache_ttl": "300s",
+   "extra_config": {
+      "security/cors": {
+  "allow_origins": [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://2a89936da485.ngrok-free.app",
+     "https://writeful-fe.onrender.com",
+    "null"
+  ],
+  "allow_methods": [
+    "POST",
+    "GET",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS"
+  ],
+  "allow_headers": [
+    "Origin",
+    "Authorization",
+    "Content-Type",
+    "Accept",
+    "X-User-ID",
+    "Accept-Encoding",
+    "Accept-Language"
+  ],
+  "expose_headers": [
+    "Content-Length",
+    "Content-Type",
+    "X-User-ID"
+  ],
+  "allow_credentials": true,
+  "max_age": "12h"
+}
+
+,
+       "telemetry/metrics": {
+    "collection_time": "60s",
+    "listen_address": ":8090"
+}
+,
+ "telemetry/logging": {
+    "level": "DEBUG",
+    "prefix": "[LOCAL-Writeful]",
+    "syslog": false,
+    "stdout": true,
+    "format":"default"
+}
+
+
+,
+      "router": {
+         "hide_version_header": true
+      }
+   },
+   "endpoints": [
+      {
+    "@comment": "Health Check",
+    "endpoint": "/health",
+    "method": "GET",
+    "output_encoding": "json",
+    "backend": [{"host": ["http://no_baz"], "url_pattern": "/"}],
+    "extra_config": {
+        "proxy": {
+            "static": {
+                "strategy": "errored",
+                "data": {
+                    "status": "OK"
+                }
+            }
+        }
+    }
+},
+{
+  "@comment": "get user profile",
+  "endpoint": "/auth/api/v1/user/profile",
+  "method": "GET",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://auth-service:8004"],
+      "url_pattern": "/api/v1/user/profile",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+    "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+  }
+},
+{
+  "@comment": "sign up",
+  "endpoint": "/auth/api/v1/user/signup",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://auth-service:8004"],
+      "url_pattern": "/api/v1/user/signup",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+  }
+},
+{
+  "@comment": "login",
+  "endpoint": "/auth/api/v1/user/login",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://auth-service:8004"],
+      "url_pattern": "/api/v1/user/login",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+  }
+},
+{
+  "@comment": "refresh token",
+  "endpoint": "/auth/api/v1/user/refresh",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://auth-service:8004"],
+      "url_pattern": "/api/v1/user/refresh",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+  }
+},
+{
+  "@comment": "update user info",
+  "endpoint": "/auth/api/v1/user/update-info",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://auth-service:8004"],
+      "url_pattern": "/api/v1/user/update-info",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+    "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+  }
+},
+{
+  "@comment": "logout",
+  "endpoint": "/auth/api/v1/user/logout",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://auth-service:8004"],
+      "url_pattern": "/api/v1/user/logout",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+    "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+  }
+},
+{
+  "@comment": "get user detail",
+  "endpoint": "/auth/api/v1/user/{username}",
+  "method": "GET",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://auth-service:8004"],
+      "url_pattern": "/api/v1/user/{username}",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+  }
+},
+{
+  "@comment": "get posts",
+  "endpoint": "/content/api/v1/post",
+  "method": "GET",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://content-service:8003"],
+      "url_pattern": "/api/v1/post",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+    }
+},
+{
+  "@comment": "get detail post",
+  "endpoint": "/content/api/v1/post/{id}",
+  "method": "GET",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://content-service:8003"],
+      "url_pattern": "/api/v1/post/{id}",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "create a post",
+  "endpoint": "/content/api/v1/post",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://content-service:8003"],
+      "url_pattern": "/api/v1/post",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "publish a post",
+  "endpoint": "/content/api/v1/post/{id}/publish",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://content-service:8003"],
+      "url_pattern": "/api/v1/post/{id}/publish",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "update a post",
+  "endpoint": "/content/api/v1/post/{id}",
+  "method": "PUT",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://content-service:8003"],
+      "url_pattern": "/api/v1/post/{id}",
+      "method": "PUT",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "upload media",
+  "endpoint": "/content/api/v1/media",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://content-service:8003"],
+      "url_pattern": "/api/v1/media",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "delete a post",
+  "endpoint": "/content/api/v1/post/{id}",
+  "method": "DELETE",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://content-service:8003"],
+      "url_pattern": "/api/v1/post/{id}",
+      "method": "DELETE",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "List active feed stories",
+  "endpoint": "/content/api/v1/stories",
+  "method": "GET",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://content-service:8003"],
+      "url_pattern": "/api/v1/stories",
+      "method": "GET",
+      "encoding": "json"
+    }
+  ],
+  "extra_config": {
+    "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+  }
+},
+{
+  "@comment": "Create a story slide",
+  "endpoint": "/content/api/v1/stories",
+  "method": "POST",
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://content-service:8003"],
+      "url_pattern": "/api/v1/stories",
+      "method": "POST",
+      "encoding": "json"
+    }
+  ],
+  "extra_config": {
+    "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+  }
+},
+{
+  "@comment": "Mark a story slide as read",
+  "endpoint": "/content/api/v1/stories/{id}/seen",
+  "method": "POST",
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://content-service:8003"],
+      "url_pattern": "/api/v1/stories/{id}/seen",
+      "method": "POST",
+      "encoding": "json"
+    }
+  ],
+  "extra_config": {
+    "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+  }
+},
+{
+  "@comment": "Fetch shared music catalog",
+  "endpoint": "/content/api/v1/musics",
+  "method": "GET",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://content-service:8003"],
+      "url_pattern": "/api/v1/musics",
+      "method": "GET",
+      "encoding": "json"
+    }
+  ],
+  "extra_config": {
+    "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+  }
+},
+{
+  "@comment": "Add new music to server catalog",
+  "endpoint": "/content/api/v1/musics",
+  "method": "POST",
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://content-service:8003"],
+      "url_pattern": "/api/v1/musics",
+      "method": "POST",
+      "encoding": "json"
+    }
+  ],
+  "extra_config": {
+    "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+  }
+},
+{
+  "@comment": "Delete a story slide",
+  "endpoint": "/content/api/v1/stories/{id}",
+  "method": "DELETE",
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://content-service:8003"],
+      "url_pattern": "/api/v1/stories/{id}",
+      "method": "DELETE",
+      "encoding": "json"
+    }
+  ],
+  "extra_config": {
+    "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+  }
+},
+{
+  "@comment": "upload image",
+  "endpoint": "/media/api/v1/image/upload",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://media-service:8005"],
+      "url_pattern": "/api/v1/images/upload",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "upload video",
+  "endpoint": "/media/api/v1/video/upload",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://media-service:8005"],
+      "url_pattern": "/api/v1/videos/upload",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+}
+
+,
+{
+  "@comment": "follow a user",
+  "endpoint": "/auth/api/v1/user/follow/{id}",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://auth-service:8004"],
+      "url_pattern": "/api/v1/user/follow/{id}",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+    "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+  }
+},
+{
+  "@comment": "get followers",
+  "endpoint": "/auth/api/v1/user/followers/{id}",
+  "method": "GET",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://auth-service:8004"],
+      "url_pattern": "/api/v1/user/followers/{id}",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+    "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+  }
+},
+{
+  "@comment": "get following",
+  "endpoint": "/auth/api/v1/user/following/{id}",
+  "method": "GET",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://auth-service:8004"],
+      "url_pattern": "/api/v1/user/following/{id}",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+    "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+  }
+},
+{
+  "@comment": "unfollow a user",
+  "endpoint": "/auth/api/v1/user/unfollow/{id}",
+  "method": "DELETE",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://auth-service:8004"],
+      "url_pattern": "/api/v1/user/unfollow/{id}",
+      "method": "DELETE",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+    "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+  }
+},
+{
+  "@comment": "create a conversation",
+  "endpoint": "/chat/api/v1/conversations",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://chat-service:8006"],
+      "url_pattern": "/api/v1/conversations",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "get list conversation",
+  "endpoint": "/chat/api/v1/conversations",
+  "method": "GET",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://chat-service:8006"],
+      "url_pattern": "/api/v1/conversations",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "get conversation by id",
+  "endpoint": "/chat/api/v1/conversations/{id}",
+  "method": "GET",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://chat-service:8006"],
+      "url_pattern": "/api/v1/conversations/{id}",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "add participant to conversation",
+  "endpoint": "/chat/api/v1/conversations/{id}/participants",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://chat-service:8006"],
+      "url_pattern": "/api/v1/conversations/{id}/participants",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "read conversation",
+  "endpoint": "/chat/api/v1/conversations/read",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://chat-service:8006"],
+      "url_pattern": "/api/v1/conversations/read",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "send a message",
+  "endpoint": "/chat/api/v1/messages",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://chat-service:8006"],
+      "url_pattern": "/api/v1/messages",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "toggle message reaction",
+  "endpoint": "/chat/api/v1/messages/{id}/reactions",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://chat-service:8006"],
+      "url_pattern": "/api/v1/messages/{id}/reactions",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "send WebRTC signaling message",
+  "endpoint": "/chat/api/v1/messages/signaling",
+  "method": "POST",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://chat-service:8006"],
+      "url_pattern": "/api/v1/messages/signaling",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "get a messages",
+  "endpoint": "/chat/api/v1/messages",
+  "method": "GET",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://chat-service:8006"],
+      "url_pattern": "/api/v1/messages",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+},
+{
+  "@comment": "delete conversation",
+  "endpoint": "/chat/api/v1/conversations/{id}/participants/{participant_id}",
+  "method": "DELETE",
+  "input_query_strings": ["*"]
+,
+  "input_headers": [
+  "Content-Type",
+  "Authorization",
+  "X-User-ID",
+  "X-User-Amaze-ID",
+  "X-Client-ID",
+  "X-Client-Name",
+  "X-Client-Role",
+  "X-API-Key",
+  "X-Language-Key"
+]
+,
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["http://chat-service:8006"],
+      "url_pattern": "/api/v1/conversations/{id}/participants/{participant_id}",
+      "method": "DELETE",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+    "extra_config": {
+      "auth/validator": {
+  "alg": "HS256",
+  "kid": "SIM2",
+  "jwk_local_path": "/jwk/symmetric_dev.json",
+  "disable_jwk_security": true,
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}
+    }
+}
+
+   ]
+}

@@ -1,0 +1,164 @@
+{
+  "@comment": "get user profile",
+  "endpoint": "/auth/api/v1/user/profile",
+  "method": "GET",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_auth }}"],
+      "url_pattern": "/api/v1/user/profile",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+    {{ template "_auth_validator.tmpl" .}}
+  }
+},
+{
+  "@comment": "sign up",
+  "endpoint": "/auth/api/v1/user/signup",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_auth }}"],
+      "url_pattern": "/api/v1/user/signup",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+  }
+},
+{
+  "@comment": "login",
+  "endpoint": "/auth/api/v1/user/login",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_auth }}"],
+      "url_pattern": "/api/v1/user/login",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+  }
+},
+{
+  "@comment": "refresh token",
+  "endpoint": "/auth/api/v1/user/refresh",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_auth }}"],
+      "url_pattern": "/api/v1/user/refresh",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+  }
+},
+{
+  "@comment": "update user info",
+  "endpoint": "/auth/api/v1/user/update-info",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_auth }}"],
+      "url_pattern": "/api/v1/user/update-info",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+    {{ template "_auth_validator.tmpl" .}}
+  }
+},
+{
+  "@comment": "logout",
+  "endpoint": "/auth/api/v1/user/logout",
+  "method": "POST",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_auth }}"],
+      "url_pattern": "/api/v1/user/logout",
+      "method": "POST",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+    {{ template "_auth_validator.tmpl" .}}
+  }
+},
+{
+  "@comment": "get user detail",
+  "endpoint": "/auth/api/v1/user/{username}",
+  "method": "GET",
+  {{ include "endpoints/input_query_strings.tmpl" }},
+  {{ include "endpoints/input_headers.tmpl" }},
+  "output_encoding": "no-op",
+  "backend": [
+    {
+      "host": ["{{ .env.backend_hosts.host_auth }}"],
+      "url_pattern": "/api/v1/user/{username}",
+      "method": "GET",
+      "encoding": "json",
+      "extra_config": {
+        "backend/http": {
+          "return_error_code": true
+        }
+      }
+    }
+  ],
+  "extra_config": {
+  }
+}

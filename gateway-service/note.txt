@@ -1,0 +1,16 @@
+ docker run --rm -it \
+  -v $(pwd):/etc/krakend \
+  -e FC_ENABLE=1 \
+  -e FC_OUT=/etc/krakend/krakend.json \
+  -e FC_PARTIALS=/etc/krakend/config/partials \
+  -e FC_SETTINGS=/etc/krakend/config/settings/dev \
+  -e FC_TEMPLATES=/etc/krakend/config/templates \
+  devopsfaith/krakend check -t -d -c /etc/krakend/krakend-seller-center-config.tmpl
+
+
+  docker run --rm -it \
+    -p 8081:8080 \
+    -v $(pwd):/etc/krakend \
+    -v $(pwd)/jwk:/jwk \
+    krakend \
+    run -d -c /etc/krakend/krakend.json

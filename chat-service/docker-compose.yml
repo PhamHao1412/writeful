@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  chat-db:
+    image: postgres:15-alpine
+    container_name: chat-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: chat_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - chat-db-data:/var/lib/postgresql/data
+    networks:
+      - chat-network
+
+  chat-service:
+    build: .
+    container_name: chat-service
+    environment:
+      APP_NAME: chat-service
+      APP_PORT: 8083
+      APP_ENV: development
+      DB_HOST: chat-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: chat_db
+      DB_SCHEMA: public
+      DB_SSL_MODE: disable
+      JWT_SECRET: your-secret-key-change-this-in-production
+      JWT_ACCESS_TOKEN_EXPIRY: 15m
+      JWT_REFRESH_TOKEN_EXPIRY: 7d
+      AUTH_SERVICE_URL: http://auth-service:8081
+    ports:
+      - "8083:8083"
+    depends_on:
+      - chat-db
+    networks:
+      - chat-network
+    restart: unless-stopped
+
+volumes:
+  chat-db-data:
+
+
+networks:
+  chat-network:
+    driver: bridge

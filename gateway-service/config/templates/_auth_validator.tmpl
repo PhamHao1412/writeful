@@ -1,0 +1,10 @@
+"auth/validator": {
+  "alg": "{{ .env.validate_token.alg }}",
+  "kid": "{{ .env.validate_token.kid }}",
+  "jwk_local_path": "{{ .env.validate_token.jwk_local_path }}",
+  "disable_jwk_security": {{ .env.validate_token.disable_jwk_security }},
+  "roles": [],
+  "propagate_claims": [
+      ["id", "X-User-ID"]
+  ]
+}

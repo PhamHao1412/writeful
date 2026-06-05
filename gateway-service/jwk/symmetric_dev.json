@@ -1,0 +1,10 @@
+{
+  "keys": [
+    {
+      "kty": "oct",
+      "k": "neithertheflamenorthedepthcouldclaimme",
+      "kid": "SIM2",
+      "alg": "HS256"
+    }
+  ]
+}
