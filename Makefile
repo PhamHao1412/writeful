@@ -105,6 +105,24 @@ deploy: pull up ## Deploy all services (pull + up)
 	@echo "$(YELLOW)Media Service: http://localhost:8005$(NC)"
 	@echo "$(YELLOW)Chat Service: http://localhost:8006$(NC)"
 
+build-all: ## Build all local service images using docker-compose
+	@echo "$(BLUE)Building all local service images...$(NC)"
+	docker-compose build
+
+push-all: build-all ## Build and push all service images to Docker Hub
+	@echo "$(BLUE)Pushing all service images to Docker Hub...$(NC)"
+	docker-compose push
+	@echo "$(GREEN)All images pushed successfully!$(NC)"
+
+tidy-all: ## Run go mod tidy on all microservices to update go.sum
+	@echo "$(BLUE)Tidying auth-service...$(NC)"
+	cd auth-service && go mod tidy
+	@echo "$(BLUE)Tidying chat-service...$(NC)"
+	cd chat-service && go mod tidy
+	@echo "$(BLUE)Tidying content-service...$(NC)"
+	cd content-service && go mod tidy
+	@echo "$(GREEN)All go.sum files updated!$(NC)"
+
 check-db: ## Check database connection
 	@echo "$(BLUE)Checking database connection...$(NC)"
 	@psql -h localhost -p 5438 -U postgres -d playground -c "SELECT 'Database is accessible!' as status;" || echo "$(RED)Cannot connect to database$(NC)"
@@ -125,3 +143,38 @@ test-endpoints: ## Test all service endpoints
 
 update-env: ## Update Cloudflare Tunnel URLs to Render FE and redeploy
 	@./update-render-env.sh
+
+install-proto-tools: ## Install protoc and Go gRPC generators
+	@echo "Installing Go plugins..."
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	@echo "Installing protoc compiler..."
+	mkdir -p bin_temp
+	curl -L https://github.com/protocolbuffers/protobuf/releases/download/v27.0/protoc-27.0-osx-aarch_64.zip -o bin_temp/protoc.zip
+	unzip -o bin_temp/protoc.zip -d bin_temp
+	mkdir -p /Users/haopham/go/bin
+	mkdir -p /Users/haopham/go/include
+	mv bin_temp/bin/protoc /Users/haopham/go/bin/protoc
+	cp -R bin_temp/include/ /Users/haopham/go/include/
+	rm -rf bin_temp
+	@echo "Tools installed successfully!"
+	@make gen-proto
+
+gen-proto: ## Generate Go code from proto files
+	@echo "Generating protobuf files..."
+	mkdir -p auth-service/pkg/pb/auth
+	mkdir -p chat-service/pkg/pb/auth
+	mkdir -p content-service/pkg/pb/auth
+	/Users/haopham/go/bin/protoc --go_out=auth-service/pkg/pb/auth --go_opt=paths=source_relative \
+	       --go-grpc_out=auth-service/pkg/pb/auth --go-grpc_opt=paths=source_relative \
+	       -I proto/auth -I /Users/haopham/go/include proto/auth/auth.proto
+	/Users/haopham/go/bin/protoc --go_out=chat-service/pkg/pb/auth --go_opt=paths=source_relative \
+	       --go-grpc_out=chat-service/pkg/pb/auth --go-grpc_opt=paths=source_relative \
+	       -I proto/auth -I /Users/haopham/go/include proto/auth/auth.proto
+	/Users/haopham/go/bin/protoc --go_out=content-service/pkg/pb/auth --go_opt=paths=source_relative \
+	       --go-grpc_out=content-service/pkg/pb/auth --go-grpc_opt=paths=source_relative \
+	       -I proto/auth -I /Users/haopham/go/include proto/auth/auth.proto
+	@echo "Protobuf files generated successfully!"
+
+
+
