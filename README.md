@@ -26,33 +26,33 @@ Below is the general system data flow for the Writeful backend:
 
 ```mermaid
 graph TD
-    Client[Client / FE App] -->|HTTP/HTTPS Requests| CFTunnel[Cloudflare Tunnel - HTTP]
-    Client -->|WebSocket Connections| CFTunnelWS[Cloudflare Tunnel - WS]
+    Client["Client / FE App"] -->|HTTP/HTTPS Requests| CFTunnel["Cloudflare Tunnel - HTTP"]
+    Client -->|WebSocket Connections| CFTunnelWS["Cloudflare Tunnel - WS"]
     
     subgraph API Gateway Layer
-        CFTunnel -->|Port 8080| Gateway[KrakenD API Gateway]
+        CFTunnel -->|Port 8080| Gateway["KrakenD API Gateway"]
     end
     
     subgraph Backend Microservices
-        Gateway -->|/v1/auth/*| AuthService[Auth Service<br/>Port 8004]
-        Gateway -->|/v1/posts/*, /v1/stories/*| ContentService[Content Service<br/>Port 8003]
-        Gateway -->|/v1/media/*| MediaService[Media Service<br/>Port 8005]
+        Gateway -->|"/v1/auth/*"| AuthService["Auth Service<br/>Port 8004"]
+        Gateway -->|"/v1/posts/*, /v1/stories/*"| ContentService["Content Service<br/>Port 8003"]
+        Gateway -->|"/v1/media/*"| MediaService["Media Service<br/>Port 8005"]
         
-        CFTunnelWS -->|Port 8006| ChatService[Chat Service<br/>Port 8006]
+        CFTunnelWS -->|Port 8006| ChatService["Chat Service<br/>Port 8006"]
         
-        ContentService -->|HTTP JWT Validate<br/>Port 8004| AuthService
-        ChatService -->|HTTP JWT Validate<br/>Port 8004| AuthService
+        ContentService -->|"HTTP JWT Validate<br/>Port 8004"| AuthService
+        ChatService -->|"HTTP JWT Validate<br/>Port 8004"| AuthService
     end
 
     subgraph External Resources
-        MediaService -->|Upload Images| Cloudinary[Cloudinary Cloud Storage]
+        MediaService -->|Upload Images| Cloudinary["Cloudinary Cloud Storage"]
     end
 
     subgraph Database Layer
-        AuthService -->|Schema: auth_service| DB[(PostgreSQL<br/>Port 5438)]
-        ContentService -->|Schema: content_service| DB
-        MediaService -->|Schema: media_service| DB
-        ChatService -->|Schema: chat_service| DB
+        AuthService -->|"Schema: auth_service"| DB[("PostgreSQL<br/>Port 5438")]
+        ContentService -->|"Schema: content_service"| DB
+        MediaService -->|"Schema: media_service"| DB
+        ChatService -->|"Schema: chat_service"| DB
     end
     
     style Gateway fill:#f9f,stroke:#333,stroke-width:2px
@@ -78,7 +78,7 @@ sequenceDiagram
     participant Gateway as KrakenD API Gateway
     participant Service as Content Service
     participant Auth as Auth Service (HTTP)
-    database DB as PostgreSQL (auth_service)
+    participant DB as PostgreSQL (auth_service)
 
     Client->>Gateway: HTTP Request (Header: Authorization: Bearer JWT)
     Gateway->>Service: Route request with Token
@@ -103,7 +103,7 @@ sequenceDiagram
     actor Client B
     participant WS as Chat Service (WS Hub)
     participant Auth as Auth Service (HTTP)
-    database DB as PostgreSQL (chat_service)
+    participant DB as PostgreSQL (chat_service)
 
     Client A->>WS: Establish WS Connection (Query Param: token=JWT)
     WS->>Auth: HTTP VerifyToken(JWT)
@@ -196,4 +196,3 @@ A root-level `Makefile` is provided to simplify orchestration, container builds,
   ```bash
   make build-all
   ```
-
