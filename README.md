@@ -16,56 +16,40 @@
 
 ---
 
-This document provides an overview of the backend microservices architecture for the **Writeful** project, detailing the services, flow diagrams, environment configuration, and operation instructions.
+**Writeful** is a modular, decoupled microservices platform designed for modern blogging, content authoring, and real-time private messaging. 
+
+The system leverages **KrakenD** as a high-throughput API Gateway, isolated **Cloudflare Tunnels** for secure zero-trust network ingress (HTTP and WebSockets), independent **Go backend services**, a multi-schema **PostgreSQL** database, and **Cloudinary** for media transformations.
 
 ---
 
-## 📌 System Overview
-
-The **Writeful** backend is built on an API-driven **Microservices** architecture designed for independence, security, and scalability. 
-
-The system consists of the following key components:
-1. **API Gateway (KrakenD)**: Centralized entry point that routes HTTP requests from clients to their corresponding downstream microservices.
-2. **Cloudflare Tunnels**: Secure tunnels that expose the API Gateway (HTTP) and the Chat Service (WebSocket) to the internet without opening public ports on the host.
-3. **Auth Service (Go - REST)**: Manages users, sign-ups, sign-ins, and issues/validates JWT tokens.
-4. **Content Service (Go - REST)**: Manages articles (posts), draft stories, search tags, and attached music.
-5. **Media Service (Go - REST)**: Uploads and manages media files (images/videos) using the Cloudinary cloud storage service.
-6. **Chat Service (Go - WebSockets/REST)**: Enables real-time private messaging between users over WebSocket connections.
-
----
-
-## 🏗️ System Architecture
-
-![System Architecture Diagram](docs/images/system_architecture.png)
-
-Below is the general system data flow for the Writeful backend:
+## System Architecture
 
 ```mermaid
 graph TD
-    Client["Client / FE App"] -->|HTTP/HTTPS Requests| CFTunnel["Cloudflare Tunnel - HTTP"]
-    Client -->|WebSocket Connections| CFTunnelWS["Cloudflare Tunnel - WS"]
+    Client["Client / Frontend App"] -->|HTTP / HTTPS REST| CFTunnel["Cloudflare Tunnel (HTTP)"]
+    Client -->|WebSocket Connections| CFTunnelWS["Cloudflare Tunnel (WS)"]
     
     subgraph API Gateway Layer
         CFTunnel -->|Port 8080| Gateway["KrakenD API Gateway"]
     end
     
-    subgraph Backend Microservices
+    subgraph Microservices Layer
         Gateway -->|"/v1/auth/*"| AuthService["Auth Service<br/>Port 8004"]
         Gateway -->|"/v1/posts/*, /v1/stories/*"| ContentService["Content Service<br/>Port 8003"]
         Gateway -->|"/v1/media/*"| MediaService["Media Service<br/>Port 8005"]
         
-        CFTunnelWS -->|Port 8006| ChatService["Chat Service<br/>Port 8006"]
+        CFTunnelWS -->|Port 8006| ChatService["Chat Service (WS Hub)<br/>Port 8006"]
         
-        ContentService -->|"HTTP JWT Validate<br/>Port 8004"| AuthService
-        ChatService -->|"HTTP JWT Validate<br/>Port 8004"| AuthService
+        ContentService -->|"Token Verification (HTTP)"| AuthService
+        ChatService -->|"Token Verification (HTTP)"| AuthService
     end
 
-    subgraph External Resources
-        MediaService -->|Upload Images| Cloudinary["Cloudinary Cloud Storage"]
+    subgraph Storage & External Services
+        MediaService -->|Direct Upload| Cloudinary["Cloudinary CDN Storage"]
     end
 
-    subgraph Database Layer
-        AuthService -->|"Schema: auth_service"| DB[("PostgreSQL<br/>Port 5438")]
+    subgraph Multi-Schema Database Layer
+        AuthService -->|"Schema: auth_service"| DB[("PostgreSQL")]
         ContentService -->|"Schema: content_service"| DB
         MediaService -->|"Schema: media_service"| DB
         ChatService -->|"Schema: chat_service"| DB
@@ -82,133 +66,160 @@ graph TD
 
 ---
 
-## 🔄 Core Flows (Flow Diagrams)
+## Microservices Breakdown
 
-### 1. User Authentication & Token Verification (HTTP)
-When a client requests a protected endpoint (e.g. creating a post in the `Content Service`), the target service makes a synchronous HTTP call to the `Auth Service` to verify the user token:
+| Service | Port | Gateway Route Prefix | Database Schema | Primary Responsibilities |
+|---|---|---|---|---|
+| **`gateway-service`** | `8080` | `/v1/*` | - | Central routing, CORS handling, rate limiting, request proxying |
+| **`auth-service`** | `8004` | `/v1/auth/*` | `auth_service` | User registration, login, JWT token issuance, token verification |
+| **`content-service`** | `8003` | `/v1/posts/*`, `/v1/stories/*` | `content_service` | Blog posts, draft stories, tagging, category feeds, background music |
+| **`media-service`** | `8005` | `/v1/media/*` | `media_service` | Media file uploads, Cloudinary CDN integrations, image metadata |
+| **`chat-service`** | `8006` | WebSocket Direct | `chat_service` | Real-time WebSocket message hub, private messaging, chat history |
+
+---
+
+## Core Interaction Flows
+
+### 1. Synchronous Token Verification Flow
+When a client requests a protected endpoint in a downstream microservice (e.g. creating a post in `content-service`), the downstream service verifies the JWT directly against `auth-service`:
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor Client
-    participant Gateway as KrakenD API Gateway
-    participant Service as Content Service
-    participant Auth as Auth Service (HTTP)
-    participant DB as PostgreSQL (auth_service)
+    participant Gateway as KrakenD Gateway (:8080)
+    participant Content as Content Service (:8003)
+    participant Auth as Auth Service (:8004)
+    participant DB as PostgreSQL
 
-    Client->>Gateway: HTTP Request (Header: Authorization: Bearer JWT)
-    Gateway->>Service: Route request with Token
-    Note over Service: User details required
-    Service->>Auth: HTTP Call: VerifyToken(Token)
-    Auth->>DB: Query user / check session details (if needed)
+    Client->>Gateway: HTTP Request (Authorization: Bearer <JWT>)
+    Gateway->>Content: Proxy Request with Token
+    Content->>Auth: HTTP POST /internal/v1/auth/verify-token
+    Auth->>DB: Validate user status & token signature
     DB-->>Auth: User Record
-    Note over Auth: Verify signature & expiration
-    Auth-->>Service: HTTP Response: VerifyTokenResponse (User ID, Role, Valid: true)
-    Note over Service: Process request with user permissions
-    Service-->>Gateway: HTTP Response
-    Gateway-->>Client: Return response to Client
+    Auth-->>Content: 200 OK {valid: true, user_id: "...", role: "..."}
+    Content->>DB: Execute post creation in content_service schema
+    Content-->>Gateway: 201 Created
+    Gateway-->>Client: JSON Response
 ```
 
 ### 2. Real-Time WebSocket Chat Flow
-Since API Gateway (KrakenD) does not natively support robust, persistent WebSocket proxying, the real-time chat traffic is isolated through a dedicated Cloudflare Tunnel pointing directly to the `Chat Service`:
+WebSocket connections bypass KrakenD and route through a dedicated Cloudflare Tunnel directly into `chat-service`'s in-memory connection hub:
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor Client A
     actor Client B
-    participant WS as Chat Service (WS Hub)
-    participant Auth as Auth Service (HTTP)
+    participant WS as Chat Service Hub (:8006)
+    participant Auth as Auth Service (:8004)
     participant DB as PostgreSQL (chat_service)
 
-    Client A->>WS: Establish WS Connection (Query Param: token=JWT)
-    WS->>Auth: HTTP VerifyToken(JWT)
-    Auth-->>WS: Token confirmed valid (User ID: A)
-    WS-->>Client A: Connection upgraded & accepted (Joined Hub)
-    
-    Note over Client A, Client B: Client B is already connected & registered to the WS Hub
-    
-    Client A->>WS: Send WS Message {to: User B, content: "Hello"}
-    WS->>DB: Save Message to database
-    DB-->>WS: Message saved successfully
-    WS->>WS: Search active connection for Client B in Hub
-    WS->>Client B: Dispatch WS Event: New Message {from: User A, content: "Hello"}
+    Client A->>WS: Establish WebSocket (query: ?token=<JWT>)
+    WS->>Auth: Verify JWT Token
+    Auth-->>WS: Token valid (User ID: A)
+    WS-->>Client A: Connection upgraded (Registered in Hub)
+    Note over Client A, Client B: Client B is already connected and active in Hub
+
+    Client A->>WS: Send message payload {to: "User B", content: "Hello"}
+    WS->>DB: Persist message record
+    WS->>WS: Lookup Client B socket in active connection pool
+    WS->>Client B: Push WebSocket Event {from: "User A", content: "Hello"}
 ```
 
 ---
 
-## 🛠️ Microservice Directory Details
+## Repository Structure
 
-### 1. Gateway Service
-* **Technology**: KrakenD API Gateway.
-* **Responsibilities**: Central entry routing, rate limiting, request/response transformation, and endpoint aggregation.
-* **Configurations**: Located in [gateway-service](file:///Users/haopham/go-playground/writeful/gateway-service).
-
-### 2. Auth Service
-* **Technology**: Go (Gin Web Framework, SQLBoiler/gorm).
-* **Responsibilities**: User signup/signin, authorization, session management, and exposing token verification APIs.
-* **Environment Configuration**: Setup details in [auth-service/.env.example](file:///Users/haopham/go-playground/writeful/auth-service/.env.example).
-
-### 3. Content Service
-* **Technology**: Go (Gin Web Framework, HTTP Client).
-* **Responsibilities**: Core posting engine, draft/publish workflows for stories, tags indexing, and background music associations.
-* **Environment Configuration**: Setup details in [content-service/.env.example](file:///Users/haopham/go-playground/writeful/content-service/.env.example).
-
-### 4. Media Service
-* **Technology**: Go (Gin Web Framework).
-* **Responsibilities**: Uploads file streams to Cloudinary, stores references in database, and returns static asset URLs.
-* **Environment Configuration**: Setup details in [media-service/.env.example](file:///Users/haopham/go-playground/writeful/media-service/.env.example).
-
-### 5. Chat Service
-* **Technology**: Go (Gorilla Websocket, HTTP Client).
-* **Responsibilities**: Handles raw WebSocket connections, maintains connection hub state, publishes messages, and tracks unread message statistics.
-* **Environment Configuration**: Setup details in [chat-service/.env.example](file:///Users/haopham/go-playground/writeful/chat-service/.env.example).
+```
+.
+├── auth-service/                # Authentication & User Management (Go)
+│   ├── cmd/serverd/
+│   ├── internal/
+│   └── .env.example
+├── content-service/             # Articles, Stories, Tags & Music (Go)
+│   ├── cmd/serverd/
+│   ├── internal/
+│   └── .env.example
+├── media-service/               # Cloudinary Uploads & Media Assets (Go)
+│   ├── cmd/serverd/
+│   ├── internal/
+│   └── .env.example
+├── chat-service/                # Real-Time WebSocket Chat Engine (Go)
+│   ├── cmd/serverd/
+│   ├── internal/
+│   └── .env.example
+├── gateway-service/             # KrakenD API Gateway configuration & Dockerfile
+│   └── krakend.json
+├── docker-compose.yml           # Multi-container orchestration specification
+└── Makefile                     # Unified management and operations interface
+```
 
 ---
 
-## ⚙️ Environment Configuration
+## Getting Started
 
-For each backend microservice, copy the `.env.example` file to `.env` and fill in the target variables:
+### Prerequisites
+
+- **Docker & Docker Compose** (v2+)
+- **Go**: `1.22+` (for local standalone development)
+- **PostgreSQL**: PostgreSQL 14+ running on port `5438` (or configured host)
+
+### 1. Configure Environment Files
+
+Create `.env` files for each microservice from their corresponding `.env.example`:
 
 ```bash
-# Execute within the corresponding microservice directories
 cp auth-service/.env.example auth-service/.env
 cp content-service/.env.example content-service/.env
 cp media-service/.env.example media-service/.env
 cp chat-service/.env.example chat-service/.env
 ```
 
-### Key Configurations:
-* **`PORT`**: The HTTP port for the service (Defaults: Auth - `8004`, Content - `8003`, Media - `8005`, Chat - `8006`).
-* **`DB.URL`**: PostgreSQL connection string. Format: `postgres://<username>:<password>@<host>:<port>/<db_name>?sslmode=disable&search_path=<schema>`.
-* **`JWT.SECRET`**: Signature secret key for JWT tokens. Replace with a secure key in production.
-* **`CLOUDINARY`**: Credentials (Cloud Name, API Key, API Secret) for the Cloudinary integration in `media-service`.
-* **`AUTH_SERVICE_GRPC_ADDR`**: The host:port for gRPC connections (Optional / Used for testing only).
+### 2. Start All Microservices
+
+Run the complete microservices ecosystem in background mode:
+
+```bash
+make up
+```
+
+Verify services status:
+
+```bash
+make ps
+```
+
+Once running, the API Gateway is available at:
+- **API Gateway**: `http://localhost:8080`
+- **Health Endpoint**: `http://localhost:8080/health`
 
 ---
 
-## 🚀 Operation & Running Guide
+## Makefile Reference
 
-A root-level `Makefile` is provided to simplify orchestration, container builds, and database utilities.
+| Command | Description |
+|---|---|
+| `make up` | Start all microservices in detached mode |
+| `make down` | Stop all microservices containers |
+| `make restart` | Restart all running microservices |
+| `make restart-gateway` | Recreate and restart `gateway-service` |
+| `make restart-auth` | Recreate and restart `auth-service` |
+| `make restart-content` | Recreate and restart `content-service` |
+| `make restart-media` | Recreate and restart `media-service` |
+| `make restart-chat` | Recreate and restart `chat-service` |
+| `make logs` | Stream live logs for all microservices |
+| `make logs-gateway` | Stream logs for `gateway-service` |
+| `make logs-auth` | Stream logs for `auth-service` |
+| `make logs-content` | Stream logs for `content-service` |
+| `make logs-media` | Stream logs for `media-service` |
+| `make logs-chat` | Stream logs for `chat-service` |
+| `make health` | Check health status of the KrakenD Gateway |
+| `make rebuild` | Pull latest images and force-recreate all containers |
+| `make clean` | Stop and remove all containers and networks |
 
-### Key Make Targets:
+---
 
-* **Start the ecosystem** (in background mode):
-  ```bash
-  make up
-  ```
-* **Stop all running containers**:
-  ```bash
-  make down
-  ```
-* **Stream container logs**:
-  ```bash
-  make logs             # Logs for all services
-  make logs-auth        # Auth Service logs only
-  make logs-content     # Content Service logs only
-  make logs-chat        # Chat Service logs only
-  ```
-* **Rebuild all local Docker images**:
-  ```bash
-  make build-all
-  ```
+## License
+
+This project is licensed under the [MIT License](LICENSE).
