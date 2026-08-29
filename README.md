@@ -1,4 +1,20 @@
-# Writeful Backend Microservices
+<div align="center">
+
+# ✍️ Writeful Backend Microservices (`writeful`)
+
+**The high-performance, event-driven Microservices platform for blogging and real-time messaging.**
+
+[![Go Version](https://img.shields.io/badge/Go-1.22%2B-00ADD8?style=flat-square&logo=go)](https://golang.org)
+[![API Gateway](https://img.shields.io/badge/KrakenD-API%20Gateway-1D70B8?style=flat-square&logo=krakend)](https://www.krakend.io/)
+[![WebSockets](https://img.shields.io/badge/WebSockets-Real--Time%20Chat-010101?style=flat-square&logo=socketdotio)](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+[![Database](https://img.shields.io/badge/PostgreSQL-Multi--Schema-4169E1?style=flat-square&logo=postgresql)](https://www.postgresql.org)
+[![Media Storage](https://img.shields.io/badge/Cloudinary-SDK-3448C5?style=flat-square&logo=cloudinary)](https://cloudinary.com)
+[![Cloudflare](https://img.shields.io/badge/Cloudflare-Tunnels-F38020?style=flat-square&logo=cloudflare)](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/)
+[![Deployment](https://img.shields.io/badge/Deploy-Docker%20Compose-2496ED?style=flat-square&logo=docker)](https://www.docker.com)
+
+</div>
+
+---
 
 This document provides an overview of the backend microservices architecture for the **Writeful** project, detailing the services, flow diagrams, environment configuration, and operation instructions.
 
